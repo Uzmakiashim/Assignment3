@@ -51,6 +51,8 @@ int main()
     }
     cout << endl << "bst[0] = (" << (*bst)[0]->key << "," << (*bst)[0]->value << ")" << endl;
     cout << endl << "bst[3] = (" << (*bst)[3]->key << "," << (*bst)[3]->value << ")" << endl;
+    //cout << endl << "bst[-1] = (" << (*bst)[-1]->key << "," << (*bst)[-1]->value << ")" << endl;
+    //cout << endl << "bst[23] = (" << (*bst)[23]->key << "," << (*bst)[23]->value << ")" << endl;
 
     cout << endl << endl << "==========" << "Test case 2" << "==========" << endl;
     cout << "remove result: " << boolalpha << bst->remove(-11) << endl;
@@ -132,6 +134,7 @@ int main()
     delete bst2;
     delete bst3;
 
+
     cout << endl << endl << "==========" << "Test case 7" << "==========" << endl;
     int tableSize = 5;
     Container<int, string>** bstTable = new Container<int, string>*[tableSize]; //it is created in the main, but should be deleted in HashingVault's destructor
@@ -150,6 +153,9 @@ int main()
 	cout << *bstHV;
 	cout << endl << "add result: " << boolalpha << bstHV->add(12, "cccc") << endl;
 	cout << *bstHV;
+
+
+
 
     cout << endl << endl << "==========" << "Test case 8" << "==========" << endl;
     int tableSize2 = 4;

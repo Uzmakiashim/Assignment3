@@ -9,11 +9,10 @@ BST<KeyType , ValueType>::BST(const BST& another)
 	if(another.root!=nullptr)
 	{
 		//creating a new root
-		root = new BSTNode<KeyType, ValueType>(another.root->data.key,another.root->data.value);
-		root->left = another.root->left;
-		root->right = another.root->right;
-
-
+		root = new BSTNode<KeyType, ValueType>(*(another.root));	//still need to figure out why there was a bug
+		//root->left = another.root->left;
+		//root->right = another.root->right;
+		//this->size = another.size;
 
 		//root = another.root;
 	}
@@ -41,7 +40,7 @@ const BST<KeyType , ValueType>* BST<KeyType, ValueType>:: findMin() const
 
 	if(root->left.root!=nullptr)
 	{
-		 root->left.findMin();
+		 return root->left.findMin();
 	}
 	return this;
 	/*
@@ -91,6 +90,7 @@ bool  BST<KeyType, ValueType>::add(KeyType key, ValueType value)
 	{
 		//condition when there are no nodes in the tree or tree is empty hence we make one
 		root = new BSTNode<KeyType, ValueType>(key,value);
+		//do we need to make the left and right null ptr?
 		return true;
 	}
 	else if(this->root->data.key==key) // || this->root->left.pair.key==key)
@@ -122,43 +122,65 @@ bool  BST<KeyType, ValueType>::remove(KeyType key)
 	if(this->isEmpty())
 		return false;
 
+	//go to either left or right subtree depending on the key
 	if(key > this->root->data.key)
 		this->root->right.remove(key);
 	else if(key < this->root->data.key)
 			this->root->left.remove(key);
+
+	//for node with two child
 	else if(this->root->left.root != nullptr &&this->root->right.root != nullptr)
 	{
-		BST<KeyType, ValueType>* min_tree=this->root->right.findMin();
-		this->root->data = mine_tree->root->data;
-		min_tree->remove(min_tree->root->data.key);
-	}
-	//when key belongs to the last node and does not have any children
-	else if(this->root->left==nullptr && this->root->right==nullptr && this->root->data.key==key)
-	{
-		delete root;
-		root = nullptr;
+		const BST<KeyType, ValueType>* min_tree=this->root->right.findMin();
+		this->root->data = min_tree->root->data;
+		this->root->right.remove(min_tree->root->data.key);
 	}
 
-	//when the node to delete only has one child, prevnode = current_node->next !!
-	else if((this->root->left!=nullptr || this->root->right!=nullptr) && (this->root->data.key==key))
+	else
 	{
-		if(this->root->left!=nullptr)
-		{
-			BSTNode<KeyType, ValueType>* save_node = this->root->left;
-			this->root->left= nullptr;
-			delete root;
-			root = save_node;
-			return true;
-		}
-		if(this->root->right!=nullptr)
-		{
-			BSTNode<KeyType, ValueType>* save_node = this->root->right;
-			this->root->right= nullptr;
-			delete root;
-			root = save_node;
-			return true;
-		}
+		BSTNode<KeyType, ValueType>* node_to_delete = root;
+		root = (root->left.isEmpty())? root->right.root:root->left.root;
+
+		node_to_delete->left.root = nullptr;
+		node_to_delete->right.root = nullptr;
+		delete node_to_delete;
+		return true;
+
+
 	}
+
+	//when key belongs to the last node and does not have any children
+//	else if(this->root->left==nullptr && this->root->right==nullptr && this->root->data.key==key)
+//	{
+//		delete root;
+//		root = nullptr;
+//	}
+
+	//when the node to delete only has one child, prevnode = current_node->next !!
+//	else if((this->root->left!=nullptr || this->root->right!=nullptr) && (this->root->data.key==key))
+//	{
+//		if(this->root->left!=nullptr)
+//		{
+//			BSTNode<KeyType, ValueType>* save_node = this->root->left;
+//			this->root->left= nullptr;
+//			delete root;
+//			root = save_node;
+//			return true;
+//		}
+//		if(this->root->right!=nullptr)
+//		{
+//			BSTNode<KeyType, ValueType>* save_node = this->root->right;
+//			this->root->right= nullptr;
+//			delete root;
+//			root = save_node;
+//			return true;
+//		}
+//	}
+
+
+
+
+
 
 
 
@@ -182,9 +204,8 @@ ValueType  BST<KeyType, ValueType>:: get(KeyType key) const
 		return root->data.value;
 	else if(root->data.key<key)
 		return this->root->right.get(key);
-	else if(root->data.key>key)
+	else //if(root->data.key>key)	//removed because this is the last condition so
 		return this->root->left.get(key);
-
 
 }
 
@@ -214,7 +235,9 @@ int BST<KeyType, ValueType>::count() const
 template <typename KeyType, typename ValueType>
 int BST<KeyType, ValueType>::height() const
 {
-	if((this->isEmpty()) ||(this->root->left.root==nullptr && this->root->left.root==nullptr))
+	if(this->isEmpty())
+		return 0;
+	else if(this->root->left.root==nullptr && this->root->right.root==nullptr)
 		return 0;
 
 		int left_subtree = this->root->left.height();
@@ -230,24 +253,73 @@ int BST<KeyType, ValueType>::height() const
 template <typename KeyType, typename ValueType>
 const Pair<KeyType, ValueType>* BST<KeyType, ValueType>::operator[] (int n) const
 {
-	if(n<0 || n> this->count())
+	if(n<0 || n> (this->count()-1))
 		return nullptr;
-	else if(n==0)
-		return &(this->root->data);
 
-	if(root->left.root!=nullptr)
-	return this->root->left.operator[](n-1);	//not sure about the returns though for this line
 
-	if(root->right.root!=nullptr)
-	return this->root->right.operator[](n-1);	//and this line
+	 int number_of_nodes = this->root->left.count();
+
+	 if(n < number_of_nodes)
+		 return this->root->left.operator[](n);
+	 else if(n==number_of_nodes)
+		 return &(this->root->data);
+	 else
+		 return this->root->right.operator[](n-number_of_nodes-1);
+
+
+
+
+//
+//	BST<KeyType, ValueType>* new_root = new BST<KeyType,ValeType>(*this);
+//	BSTNode<KeyType, ValueType>* array_of_node[this->count()];
+//
+//	for(int i=0;i<this->size;i++)
+//	{
+//	 array_of_node[i]= new BSTNode<keyType,ValueType>(new_root->findMin()->key,new_root->findMin()->Value);
+//	 new_root->remove(new_root->findMin());
+//	}
+
+//	else if(n==0)
+//		return &(this->root->data);
+//
+//	if(root->left.root!=nullptr)
+//	return this->root->left.operator[](n-1);	//not sure about the returns though for this line
+//
+//	if(root->right.root!=nullptr)
+//	return this->root->right.operator[](n-1);	//and this line
 
 
 
 	//use an array to store all the values from min to max then use n as index and return ?
+	// use total number of nodes there are then total node - n = how many times you need to traverse through
+
+//	{
+//		if(this->count() - n ==0 )
+//			return &(this->root->data);
+//		else if(this->root->left.root!=nullptr)
+//		{
+//			return this->root->left.operator[](n+1);
+//		}
+//		else
+//		{
+//			return this->root->right.operator[](n+1);
+//		}
+//
+//
+//	}
+//
+//	{
+//		if(this->count() - n ==0)
+//			return &(this->root->data);
+//		else if(this->root->left.root!=nullptr)
+//			return this->root->left.operator[](n+1);
+//	}
+//}
+
+
+
 
 }
-
-
 
 
 
@@ -270,7 +342,7 @@ void BST<KeyType, ValueType>::print(ostream& os) const
 	 if(this->root->left.root!=nullptr)
 		this->root->left.print(os);
 
-	os<<"("<<this->root->data.key<<","<<this->root->data.key;
+	os<<"("<<this->root->data.key<<","<<this->root->data.value<<")";
 	//if (this->root->right.root== nullptr)
 		//os<<"("<<this->root.data.key<<","<<this->root->left.data.key;
 	if(this->root->right.root!=nullptr)

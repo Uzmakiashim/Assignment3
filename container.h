@@ -28,10 +28,7 @@ public:
 
 	//return the value given a key
 	//if the key is not found in the container, you should use the following code in the derived class's implementation of this function:
-	//		if (typeid(ValueType) == typeid(int))
-	//			return 0;
-	//		else
-	//			return ValueType();
+	//
 	virtual ValueType get(KeyType key) const = 0;
 
 	//return the number of items this container has

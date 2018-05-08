@@ -17,18 +17,20 @@ HashingVault<KeyType,ValueType>::HashingVault(int size, Container<KeyType, Value
 
 	//destructor
 	//while the table (2d array) was created outside
-	//you should delete the table completely here
+	//y ou should delete the table completely here
 template <typename KeyType, typename ValueType>
 HashingVault<KeyType,ValueType>::~HashingVault()
 {
 
-	if(size!=0)
-	{
-		for(int i =0;i<size;i++)
+//	if(size!=0)
+//	{
+ 		for(int i =0;i<size;i++)
+		{
 			delete table[i];
-
+			table[i]= nullptr;
+		}
 		delete[]table;
-	}
+//	}
 }
 
 	//add (key, value) pair to the hash table and return true if the key is not already there
@@ -54,7 +56,7 @@ bool HashingVault<KeyType,ValueType>:: add(KeyType key, ValueType value)
 template <typename KeyType, typename ValueType>
 ValueType HashingVault<KeyType,ValueType>:: get(KeyType key) const
 {
-	return table[fun(key)].get(key);
+	return table[fun(key)]->get(key);
 }
 
 	//if the specified key exists, remove the item that has it and return true
@@ -63,7 +65,7 @@ template <typename KeyType, typename ValueType>
 bool HashingVault<KeyType,ValueType>::remove(KeyType key)
 {
 
-	return table[fun(key)].remove(key);
+	return table[fun(key)]->remove(key);
 }
 
 	//update the size, containers/table, and the hash function
@@ -72,7 +74,7 @@ bool HashingVault<KeyType,ValueType>::remove(KeyType key)
 template <typename KeyType, typename ValueType>
 void HashingVault<KeyType,ValueType>:: rehash(int size, Container<KeyType, ValueType>** table, int (*fun)(KeyType))
 {
-	if(this->table==nullptr)
+	if(table==nullptr)
 		return;
 
 	for(int i =0;i<size;i++)
@@ -84,10 +86,18 @@ void HashingVault<KeyType,ValueType>:: rehash(int size, Container<KeyType, Value
 			const Pair<KeyType,ValueType>*  saveMe = this->table[i]->operator[](k);
 			int hash_value = fun(saveMe->key);
 			table[hash_value]->add(saveMe->key,saveMe->value);
+
+
 		}
+	}
+
+	//deleting each containers in the table
+	for(int i =0;i<this->size;i++)
+	{
+			delete this->table[i];
 
 	}
-	delete this->table;
+	delete [](this->table);
 	this->table = nullptr;
 
 	this->size = size;

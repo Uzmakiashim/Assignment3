@@ -20,15 +20,17 @@ SmartArray<KeyType , ValueType>::SmartArray():data(nullptr),size(0)
 template <typename KeyType, typename ValueType>
 SmartArray<KeyType , ValueType>::~SmartArray()
 {
-	if(size==0)
-		return;
-	else
+	//if(size==0)
+		//return;
+	//else
 	{
 	for(int i=0;i<size;i++)
 	{
 		delete data[i];
+		data[i] = nullptr;
 	}
 	delete[]data;
+	data = nullptr;
 	}
 
 
@@ -43,7 +45,7 @@ bool SmartArray<KeyType , ValueType>::add(KeyType key, ValueType value)
 {
 	if(this->data==nullptr)
 		{
-			Pair<KeyType , ValueType>** array_pointers = new Pair<KeyType , ValueType>* [++size];
+			Pair<KeyType , ValueType>** array_pointers = new Pair<KeyType , ValueType>* [++size]; //size++ already done
 			array_pointers[0] = new Pair<KeyType , ValueType>(key,value); //1
 			this->data = array_pointers;
 			return true;
@@ -65,8 +67,17 @@ bool SmartArray<KeyType , ValueType>::add(KeyType key, ValueType value)
 		{
 			 array_pointers[i] = new Pair<KeyType , ValueType>(data[i]->key,data[i]->value); //2
 		}
-		delete []data;
 
+		//deleting the old objects
+		for(int i =0;i<size;i++)
+			{
+				delete data[i];
+			}
+
+		//Mem check as you are creating new pairs using data you have not deleted the old pairs
+
+		delete []data;	//changed from delete[]data
+		data = nullptr;
 		//adding the new key and value at the end of array
 		array_pointers[size] = new Pair<KeyType , ValueType> (key,value); //3
 		size++;
@@ -116,22 +127,29 @@ bool SmartArray<KeyType , ValueType>::remove(KeyType key)
 				exist = true;
 		}
 
-		if(exist)
+		if(!exist) //if it does not exist
 			return false;
 	}
 
 
 	Pair<KeyType , ValueType>** new_array = new Pair<KeyType , ValueType>*[size-1];
 
-	for(int i=0;i<size;i++)
+	for(int i=0,k =0;i<size;i++,k++)
 	{
 		if(data[i]->key!=key)
-			new_array[i]=data[i];
+			new_array[k]=data[i];
 		else
+		{
+			delete this->data[i];	//delete the data[i] that needs to be remove
+			k--;
 			continue;
+		}
 	}
 
-	delete data;
+
+	delete []data;	//delete the array of pointers// Note it will not call the delete of smartarray as it is not a smartArray object
+	data = new_array;
+	this->size = size-1;
 	return true;
 
 }
@@ -141,6 +159,13 @@ bool SmartArray<KeyType , ValueType>::remove(KeyType key)
 template <typename KeyType, typename ValueType>
 ValueType SmartArray<KeyType , ValueType>::get(KeyType key) const
 {
+	if(size==0)
+	{
+		if (typeid(ValueType) == typeid(int))
+			return 0;
+		else
+			return ValueType();
+	}
 	bool key_found = false;
 	int index ;
 	for(int i =0;i<size;i++)
@@ -153,7 +178,7 @@ ValueType SmartArray<KeyType , ValueType>::get(KeyType key) const
 
 	}
 
-	if((!key_found) || size==0)
+	if((!key_found))
 	{
 		if (typeid(ValueType) == typeid(int))
 						return 0;
@@ -199,10 +224,14 @@ void SmartArray<KeyType , ValueType>::print(ostream& os) const
 {
 	if(size==0)
 		return;
+
+
 	else
 	{
+
 		for(int i =0;i<size;i++)
 			os<<"("<<data[i]->key<<","<<data[i]->value<<")";
+
 
 	}
 
