@@ -1,10 +1,11 @@
-//do NOT submit this file
-//do NOT modify this file
+/*
+ *  A generic key-value pair
+ */
 
 #ifndef PAIR_H_
 #define PAIR_H_
 
-//A generic key-value pair
+
 template <typename KeyType, typename ValueType>
 struct Pair
 {

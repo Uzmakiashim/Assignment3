@@ -1,6 +1,8 @@
-//do NOT submit this file
-//while you may modify the main function to design your own test cases to test your program
-//you should make sure your submitted code (i.e. those submitted files) can be compiled with this main.cpp in its unmodified state
+/*
+ Author: Shakya Ashim
+ Purpose: To use Binary Search Tree, Smart Array, Hashing for data
+ 
+ */
 
 #include <iostream>
 #include <sstream>

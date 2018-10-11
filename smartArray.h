@@ -1,10 +1,11 @@
-//do NOT submit this file
-//do NOT modify this file
 
+/*
+ *SmartArray is smart in the sense that the underlying array will automatically expand or shrink as needed
+ */
 #ifndef SMART_ARRAY_H
 #define SMART_ARRAY_H
 
-//SmartArray is smart in the sense that the underlying array will automatically expand or shrink as needed
+
 template <typename KeyType, typename ValueType>
 class SmartArray : public Container<KeyType, ValueType>
 {

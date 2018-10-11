@@ -1,14 +1,16 @@
-//do NOT submit this file
-//do NOT modify this file
+/*
+ *  HashingVault is a highly customizable hash table that uses separate chaining
+ *  instead of using linked lists for the chains, some general containers are used
+ *  a container can be a binary search tree or a smart array or actually any class that implements the Container class
+ 
+ */
 
 #ifndef HASHING_VAULT_H_
 #define HASHING_VAULT_H_
 
 #include "container.h"
 
-//HashingVault is a highly customizable hash table that uses separate chaining
-//instead of using linked lists for the chains, some general containers are used
-//a container can be a binary search tree or a smart array or actually any class that implements the Container class
+
 template <typename KeyType, typename ValueType>
 class HashingVault
 {

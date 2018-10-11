@@ -1,5 +1,6 @@
-//do NOT submit this file
-//do NOT modify this file
+/*
+ *BST is a Binary Search Tree class
+ */
 
 #ifndef BST_H_
 #define BST_H_
@@ -8,7 +9,7 @@
 #include <typeinfo>
 using namespace std;
 
-//BST is a Binary Search Tree class
+
 template <typename KeyType, typename ValueType>
 class BST : public Container<KeyType, ValueType>
 {
